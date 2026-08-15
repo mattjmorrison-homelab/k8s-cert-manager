@@ -1,0 +1,4 @@
+apiVersion: v2
+name: cert-manager-verify
+description: Post-deploy verify hook for cert-manager
+version: 0.1.0
