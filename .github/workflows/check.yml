@@ -1,0 +1,32 @@
+name: Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check:
+    runs-on: k8s-amd64
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      # This repo only owns verify/ (a small ConfigMap+Job subchart) --
+      # the real app is a vendored upstream chart, not something local
+      # to dry-run the same way. See the second step below for that.
+      - uses: mattjmorrison-homelab/actions-helm@501cabae5dc94b30fa8810e1a0d6a4aef6c853db
+        with:
+          chart-path: verify
+          namespace: cert-manager
+          service-account: cert-manager-ci
+
+      # The actual thing this repo exists to hold: values.yaml
+      # overriding the real upstream chart. Confirms it still renders
+      # cleanly against the same chart/repo the live Application uses,
+      # so a values-schema break shows up here before the real cluster.
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: "v3.21.4"
+      - run: |
+          helm repo add jetstack https://charts.jetstack.io
+          helm repo update
+          helm template jetstack/cert-manager -f values.yaml
