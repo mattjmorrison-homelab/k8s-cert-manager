@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: k8s-cert-manager
+  annotations:
+    github.com/project-slug: mattjmorrison-homelab/k8s-cert-manager
+spec:
+  type: certificate-manager
+  owner: mattjmorrison-homelab
+  system: cert-manager
